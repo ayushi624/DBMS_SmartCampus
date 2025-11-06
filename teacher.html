@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SmartCampus Dashboard — Ultra</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+    <div class="app">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="logo"><img src="img1.png"></div>
+                <div>SmartCampus</div>
+            </div>
+            <nav class="nav">
+                <a href="index.html" class="active">🏠 Dashboard</a>
+                <!-- <a href="teacher/myvault.html">📂 MyVault</a> -->
+                <a href="teacher/comps_tch.html">📢 Complaints</a>
+                <!-- <a href="teacher/lost_found.html">🔎 Lost & Found</a> -->
+                <a href="teacher/teacher-attendance.html">📅 Attendance</a>
+                <!-- <a href="teacher/to_do_list.html" >📝 To-Do</a> -->
+                <a href="#calendarSection">🗓️ Calendar</a>
+            </nav>            
+            <div class="tools">
+                <!-- <button class="tool-btn" id="toggleTheme"> Toggle Dark</button>
+                <button class="tool-btn" id="openDrawer"> Notifications</button> -->
+            </div>
+        </aside>
+
+        <main>
+            <header class="topbar">
+                <div class="topbar-inner">
+                    <div class="search" style="min-width:260px;">
+                        🔎 <input id="search" placeholder="Search features, files, events... " />
+                    </div>
+                    <div class="user-profile">AS</div>
+                </div>
+            </header>
+
+            <div class="container">
+                <section class="welcome">
+                    <h2>Good afternoon, Prof. Sharma! </h2>
+                    <p class="muted">Ready to make the most of your teaching experience today?</p>
+                    <div class="stats">
+                        <div class="stat">
+                            <h3 data-count="3">3</h3>
+                            <p>Classes Today</p>
+                        </div>
+                        <div class="stat">
+                            <h3 data-count="5">5</h3>
+                            <p>Tasks Pending</p>
+                        </div>
+                        <div class="stat">
+                            <h3 data-count="94">1</h3>
+                            <p>Meeting Today</p>
+                        </div>
+                    </div>
+                </section>
+
+                
+                <section class="quick-access" id="qa">
+                    <!-- <div class="card" draggable="true" data-id="vault">
+                        <h3>📂 Document Vault</h3>
+                        <p>Store and organize your documents securely</p><a href="Teacher/myvault.html">Open →</a>
+                    </div> -->
+                    <div class="card" draggable="true" data-id="complaints">
+                        <h3>📢 Complaints</h3>
+                        <p>Resolve the campus complaints</p><a href="Teacher/comps_tch.html">Open →</a>
+                    </div>
+                    <!-- <div class="card" draggable="true" data-id="lost">
+                        <h3>🔎 Lost & Found</h3>
+                        <p>Report lost items or find what you're looking for</p><a href="Teacher/lost_found.html">Open →</a>
+                    </div> -->
+                    <div class="card" draggable="true" data-id="attendance">
+                        <h3>📅 Attendance</h3>
+                        <p>Mark your class attendance</p><a href="Teacher/teacher-attendance.html">Open →</a>
+                    </div>
+                    <!-- <div class="card" draggable="true" data-id="todo">
+                        <h3>📝 To-Do List Manager</h3>
+                        <p>Manage your tasks</p><a href="Teacher/to_do_list.html">Open →</a>
+                    </div> -->
+                    <div class="card" draggable="true" data-id="map">
+                        <h3>🗓️ Calendar</h3>
+                        <p>Never miss your academic deadlines</p><a href="#calendarSection">Open →</a>
+                    </div>
+                </section>
+
+                
+
+                <section class="panel" id="upcoming">
+                    <h2>Upcoming Events</h2>
+                    <ul class="list">
+                        <li><span> Physics Midterm</span><span class="tag blue">Tomorrow, 10:00 AM</span></li>
+                        <li><span> Study Group Meeting</span><span class="tag green">Friday, 2:00 PM</span></li>
+                    </ul>
+                </section>
+
+                <section class="calendar panel" id="calendarSection">
+                    <div class="cal-header">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <h2>Interactive Calendar</h2>
+                            <select id="categoryFilter">
+                                <option value="all">All</option>
+                                <option value="class">Class</option>
+                                <option value="exam">Exam</option>
+                                <option value="club">Club</option>
+                                <option value="personal">Personal</option>
+                            </select>
+                        </div>
+                        <div class="cal-nav">
+                            <button class="btn" id="prevMonth">◀</button>
+                            <div id="monthLabel" class="chip">August 2025</div>
+                            <button class="btn" id="nextMonth">▶</button>
+                            <button class="btn" id="todayBtn">Today</button>
+                            <button class="btn primary" id="addEventBtn">+ Add Event</button>
+                        </div>
+                    </div>
+                    <div class="cal-grid" id="weekdayRow">
+                        <div class="weekday">Sun</div>
+                        <div class="weekday">Mon</div>
+                        <div class="weekday">Tue</div>
+                        <div class="weekday">Wed</div>
+                        <div class="weekday">Thu</div>
+                        <div class="weekday">Fri</div>
+                        <div class="weekday">Sat</div>
+                    </div>
+                    <div class="cal-grid" id="calGrid">
+                        <div class="day other">
+                            <div class="dnum">27</div>
+                        </div>
+                        <div class="day other">
+                            <div class="dnum">28</div>
+                        </div>
+                        <div class="day other">
+                            <div class="dnum">29</div>
+                        </div>
+                        <div class="day other">
+                            <div class="dnum">30</div>
+                        </div>
+                        <div class="day other">
+                            <div class="dnum">31</div>
+                        </div>
+                        <div class="day">
+                            <div class="dnum">1</div>
+                        </div>
+                        <div class="day">
+                            <div class="dnum">2</div>
+                        </div>
+                        <div class="day">
+                            <div class="dnum">3</div>
+                        </div>
+                        <div class="day">
+                            <div class="dnum">4</div>
+                        </div>
+                        <div class="day">
+                            <div class="dnum">5</div>
+                        </div>
+                        <div class="day">
+                            <div class="dnum">6</div>
+                        </div>
+                        <div class="day">
+                            <div class="dnum">7</div>
+                        </div>
+                        <div class="day">
+                            <div class="dnum">8</div>
+                        </div>
+                        <div class="day">
+                            <div class="dnum">9</div>
+                        </div>
+                        <div class="day">
+                            <div class="dnum">10</div>
+                        </div>
+                        <div class="day">
+                            <div class="dnum">11</div>
+                        </div>
+                        <div class="day">
+                            <div class="dnum">12</div>
+                        </div>
+                        <div class="day">
+                            <div class="dnum">13</div>
+                        </div>
+                        <div class="day">
+                            <div class="dnum">14</div>
+                        </div>
+                        <div class="day">
+                            <div class="dnum">15</div>
+                        </div>
+                        <div class="day">
+                            <div class="dnum">16</div>
+                        </div>
+                        <div class="day">
+                            <div class="dnum">17</div>
+                        </div>
+                        <div class="day">
+                            <div class="dnum">18</div>
+                        </div>
+                        <div class="day">
+                            <div class="dnum">19</div>
+                        </div>
+                        <div class="day">
+                            <div class="dnum">20</div>
+                        </div>
+                        <div class="day">
+                            <div class="dnum">21</div>
+                        </div>
+                        <div class="day">
+                            <div class="dnum">22</div>
+                        </div>
+                        <div class="day">
+                            <div class="dnum">23</div>
+                        </div>
+                        <div class="day">
+                            <div class="dnum">24</div>
+                        </div>
+                        <div class="day">
+                            <div class="dnum">25</div>
+                        </div>
+                        <div class="day">
+                            <div class="dnum">26</div>
+                        </div>
+                        <div class="day">
+                            <div class="dnum">27</div>
+                        </div>
+                        <div class="day">
+                            <div class="dnum">28</div>
+                        </div>
+                        <div class="day">
+                            <div class="dnum">29</div>
+                        </div>
+                        <div class="day">
+                            <div class="dnum">30</div>
+                        </div>
+                        <div class="day">
+                            <div class="dnum">31</div>
+                            <div class="event" draggable="true" style="background: rgb(59, 130, 246);">DS Lecture</div>
+                        </div>
+                        <div class="day other">
+                            <div class="dnum">1</div>
+                            <div class="event" draggable="true" style="background: rgb(239, 68, 68);">Physics Midterm
+                            </div>
+                        </div>
+                        <div class="day other">
+                            <div class="dnum">2</div>
+                        </div>
+                        <div class="day other">
+                            <div class="dnum">3</div>
+                            <div class="event" draggable="true" style="background: rgb(168, 85, 247);">Robotics Club
+                            </div>
+                        </div>
+                        <div class="day other">
+                            <div class="dnum">4</div>
+                        </div>
+                        <div class="day other">
+                            <div class="dnum">5</div>
+                        </div>
+                        <div class="day other">
+                            <div class="dnum">6</div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+
+    
+
+    </div>
+
+    <button class="fab" id="fab" title="Quick create">+</button>
+
+</body>
+
+</html>

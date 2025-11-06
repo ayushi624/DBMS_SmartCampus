@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartCampus - Sign Up</title>
+  <link rel="stylesheet" href="signup.css">
+</head>
+<body>
+  <div class="signup-card">
+    <h1>Create Account</h1>
+    <p>Join SmartCampus Today</p>
+
+    <form id="signupForm">
+      <div class="grid-2">
+        <div class="field">
+          <label for="name">Full Name</label>
+          <input type="text" id="name" placeholder="Enter your name" required>
+        </div>
+
+        <div class="field">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" placeholder="student@university.edu" required>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="field">
+          <label for="role">You are a</label>
+          <select id="role" required>
+            <option value="">Select</option>
+            <option value="student">Student</option>
+            <option value="teacher">Teacher</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="idInput">ID</label>
+          <input type="text" id="idInput" placeholder="Enter your ID" required>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="field">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="Enter password" minlength="6" required>
+        </div>
+
+        <div class="field">
+          <label for="confirmPassword">Confirm Password</label>
+          <input type="password" id="confirmPassword" placeholder="Re-enter password" required>
+        </div>
+      </div>
+
+      <button type="submit" class="btn primary">Sign Up</button>
+
+      <div class="login-link">
+        Already have an account? <a href="login.html">Log in</a>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    const form = document.getElementById("signupForm");
+    const role = document.getElementById("role");
+
+    form.addEventListener("submit", function(e) {
+      e.preventDefault(); 
+
+      if (role.value === "student") {
+        window.location.href = "index.html";
+      } else if (role.value === "teacher") {
+        window.location.href = "teacher.html";
+      }
+    });
+  </script>
+</body>
+</html>
