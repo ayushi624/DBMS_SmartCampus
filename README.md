@@ -15,14 +15,10 @@ SmartCampus is a **modern, user-friendly web application** that centralizes esse
 
 ---
 
-## ✨ Features
-✅ **MyVault** – Secure upload, categorize, and download documents  
+## ✨ Features 
 ✅ **Complaint System** – File and track campus-related complaints  
-✅ **Campus Map** – Interactive campus navigation with tagging  
-✅ **Lost & Found** – Report and claim lost items  
 ✅ **Attendance Tracker** – Real-time check-in and statistics  
 ✅ **To-Do Calendar** – Task manager with reminders  
-✅ **Admin Panel** – Role-based dashboard for efficient management  
 
 ---
 
