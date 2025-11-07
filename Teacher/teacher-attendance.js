@@ -85,3 +85,36 @@ function showToast(message) {
     setTimeout(() => toast.remove(), 400);
   }, 2000);
 }
+
+
+
+// ===== 6. SAVE ATTENDANCE TO BACKEND =====
+async function saveAttendance(rollNo, status) {
+  try {
+    const res = await fetch("http://localhost:5000/attendance", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        student_univ_id: rollNo,
+        status: status,
+        date: new Date().toISOString().split("T")[0], // today’s date
+      }),
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      console.log(`✅ Attendance saved for ${rollNo}`);
+    } else {
+      console.error("❌ Failed to save attendance:", data.message);
+    }
+  } catch (err) {
+    console.error("⚠️ Error saving attendance:", err);
+  }
+}
+
+// hook it into your existing setAttendance()
+const oldSetAttendance = setAttendance;
+setAttendance = (rollNo, status, row) => {
+  oldSetAttendance(rollNo, status, row); // keep the old behavior
+  saveAttendance(rollNo, status); // also sync to backend
+};

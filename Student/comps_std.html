@@ -73,5 +73,70 @@
       </div>
     </div>
     </main>
+
+<script>
+const studentUnivId = "2410990272"; // Replace with logged-in student's ID later
+
+// Handle new complaint submission
+document.getElementById("reportForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const title = document.getElementById("title").value.trim();
+  const description = document.getElementById("description").value.trim();
+
+  if (!title || !description) return alert("Please fill all fields!");
+
+  try {
+    const res = await fetch("http://localhost:5000/complaints", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ student_univ_id: studentUnivId, title, description }),
+    });
+
+    const data = await res.json();
+    alert(data.message);
+    if (data.success) {
+      document.getElementById("reportForm").reset();
+      fetchComplaints();
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Error submitting complaint");
+  }
+});
+
+// Fetch and display student's complaints
+async function fetchComplaints() {
+  try {
+    const res = await fetch(`http://localhost:5000/complaints/${studentUnivId}`);
+    const data = await res.json();
+    const tbody = document.querySelector("#reportsTable tbody");
+    tbody.innerHTML = "";
+
+    if (!data.success || data.data.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5">No complaints submitted yet.</td></tr>`;
+      return;
+    }
+
+    data.data.forEach((c) => {
+      tbody.innerHTML += `
+        <tr>
+          <td>${c.title}</td>
+          <td>${c.description}</td>
+          <td>${new Date(c.created_at).toLocaleString()}</td>
+          <td>${c.status}</td>
+          <td>${c.status === "Resolved" ? "✅" : "⏳"}</td>
+        </tr>
+      `;
+    });
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+fetchComplaints();
+</script>
+
+
   </body>
 </html>

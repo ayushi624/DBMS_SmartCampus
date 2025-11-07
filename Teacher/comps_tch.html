@@ -88,6 +88,51 @@
       </div>
     </div>
     </main>
+
+<script>
+async function fetchComplaints() {
+  const res = await fetch("http://localhost:5000/complaints");
+  const data = await res.json();
+
+  const tbody = document.querySelector(".reports-table tbody");
+  tbody.innerHTML = "";
+
+  data.data.forEach((c) => {
+    tbody.innerHTML += `
+      <tr>
+        <td>${c.student_univ_id}</td>
+        <td>${c.title}</td>
+        <td>${c.description}</td>
+        <td>${new Date(c.created_at).toLocaleString()}</td>
+        <td>
+          <select class="status-select" data-id="${c.complaint_id}">
+            <option ${c.status === "Pending" ? "selected" : ""}>Pending</option>
+            <option ${c.status === "In Progress" ? "selected" : ""}>In Progress</option>
+            <option ${c.status === "Resolved" ? "selected" : ""}>Resolved</option>
+          </select>
+        </td>
+      </tr>
+    `;
+  });
+
+  document.querySelectorAll(".status-select").forEach(select => {
+    select.addEventListener("change", async (e) => {
+      const id = e.target.getAttribute("data-id");
+      const status = e.target.value;
+      await fetch(`http://localhost:5000/complaints/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status })
+      });
+      alert("Status updated!");
+    });
+  });
+}
+
+fetchComplaints();
+</script>
+
+
   </body>
 </html>
 

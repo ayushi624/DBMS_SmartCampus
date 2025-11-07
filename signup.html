@@ -61,18 +61,48 @@
   </div>
 
   <script>
-    const form = document.getElementById("signupForm");
-    const role = document.getElementById("role");
+  const form = document.getElementById("signupForm");
 
-    form.addEventListener("submit", function(e) {
-      e.preventDefault(); 
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-      if (role.value === "student") {
-        window.location.href = "index.html";
-      } else if (role.value === "teacher") {
-        window.location.href = "teacher.html";
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const role = document.getElementById("role").value;
+    const idInput = document.getElementById("idInput").value;
+    const password = document.getElementById("password").value;
+    const confirmPassword = document.getElementById("confirmPassword").value;
+
+    if (password !== confirmPassword) {
+      alert("Passwords do not match!");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:5000/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password, role, idInput }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert(data.message);
+        if (role === "student") {
+          window.location.href = "index.html";
+        } else {
+          window.location.href = "teacher.html";
+        }
+      } else {
+        alert(data.error || "Something went wrong");
       }
-    });
-  </script>
+    } catch (error) {
+      console.error(error);
+      alert("Server error");
+    }
+  });
+</script>
+
 </body>
 </html>
