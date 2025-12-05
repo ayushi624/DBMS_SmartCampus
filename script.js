@@ -1,39 +1,47 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", async () => {
+    // 1. Check Login Status
+    const studentID = localStorage.getItem("student_univ_id");
+    const fullName = localStorage.getItem("full_name");
 
-    // loading the tasksssss from localStorage
-    let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+    if (!studentID) {
+        alert("Please login first.");
+        window.location.href = "login.html"; // Kick them out if not logged in
+        return;
+    }
 
-    const searchInput = document.getElementById('search');
+    // 2. Update Name on Dashboard
+    if (fullName) {
+        const firstName = fullName.split(" ")[0]; // Get just the first name
+        document.getElementById("welcomeMsg").innerText = `Good afternoon, ${firstName}!`;
+    }
 
-    // gm and gn
-    function updateGreeting() {
-        const hour = new Date().getHours();
-        const greetingEl = document.querySelector('.welcome h2');
+    // 3. Fetch Real Attendance
+    try {
+        const response = await fetch(`http://127.0.0.1:3000/attendance/${studentID}`);
+        const result = await response.json();
 
-        if (hour < 12) {
-            greetingEl.textContent = 'Good morning, Ayushi!';
-        } else if (hour < 18) {
-            greetingEl.textContent = 'Good afternoon, Ayushi!';
+        if (result.success && result.data.length > 0) {
+            // Calculate average attendance across all subjects
+            let totalClasses = 0;
+            let attendedClasses = 0;
+
+            result.data.forEach(subject => {
+                totalClasses += subject.total_classes;
+                attendedClasses += subject.attended_classes;
+            });
+
+            // Avoid division by zero
+            const totalPercentage = totalClasses > 0 
+                ? Math.round((attendedClasses / totalClasses) * 100) 
+                : 0;
+
+            // Update the HTML
+            document.getElementById("attendanceVal").innerText = `${totalPercentage}`;
         } else {
-            greetingEl.textContent = 'Good evening, Ayushi!';
+            document.getElementById("attendanceVal").innerText = "0";
         }
+
+    } catch (error) {
+        console.error("Error fetching attendance:", error);
     }
-
-    function filterCards() {
-        const query = searchInput.value.toLowerCase().trim();
-        const cards = document.querySelectorAll('.quick-access .card');
-
-        cards.forEach(card => {
-            const cardText = card.textContent.toLowerCase();
-            if (cardText.includes(query)) {
-                card.style.display = 'block';
-            } else {
-                card.style.display = 'none';
-            }
-        });
-    }
-
-    searchInput.addEventListener('input', filterCards);
-
-    updateGreeting();
 });

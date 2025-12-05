@@ -79,7 +79,8 @@
     }
 
     try {
-      const response = await fetch("http://localhost:5000/signup", {
+      // ✅ FIX 1: Changed Port 5000 -> 3000
+      const response = await fetch("http://127.0.0.1:3000/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password, role, idInput }),
@@ -88,18 +89,17 @@
       const data = await response.json();
 
       if (response.ok) {
-        alert(data.message);
-        if (role === "student") {
-          window.location.href = "index.html";
-        } else {
-          window.location.href = "teacher.html";
-        }
+        alert("Account created successfully! Please log in.");
+        
+        // ✅ FIX 2: Redirect to Login Page
+        // We do this so the user can Log In and save their data to LocalStorage
+        window.location.href = "login.html"; 
       } else {
         alert(data.error || "Something went wrong");
       }
     } catch (error) {
       console.error(error);
-      alert("Server error");
+      alert("Server error. Is Node running on Port 3000?");
     }
   });
 </script>
