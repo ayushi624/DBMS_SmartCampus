@@ -1,11 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // loading the tasksssss from localStorage
-    let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+    // -------------------------
+    // 🔹 EXISTING CODE (unchanged)
+    // -------------------------
 
+    let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
     const searchInput = document.getElementById('search');
 
-    // gm and gn
     function updateGreeting() {
         const hour = new Date().getHours();
         const greetingEl = document.querySelector('.welcome h2');
