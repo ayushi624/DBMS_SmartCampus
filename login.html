@@ -60,7 +60,7 @@
       }
 
       try {
-        // ✅ FIX 1: Changed Port 5000 -> 3000 and localhost -> 127.0.0.1
+        // Ensure Port is 3000
         const res = await fetch("http://127.0.0.1:3000/login", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -71,26 +71,30 @@
 
         if (data.success) {
           alert("Login successful!");
+
+          // ✅ CRITICAL FIX: Save the entire user object as "user"
+          // This is what teacher-attendance.js and student-attendance.js are looking for.
+          localStorage.setItem("user", JSON.stringify(data.user));
           
-          // ✅ FIX 2: The ID is inside 'data.user', not just 'data'
-          // We also save the Full Name for the dashboard greeting
-          localStorage.setItem("student_univ_id", data.user.student_univ_id);
-          localStorage.setItem("full_name", data.user.full_name); 
+          // Also save role separately just in case other old pages need it
           localStorage.setItem("role", role);
 
+          // Redirect based on role
           if (role === "student") {
-            window.location.href = "index.html"; // Redirect to dashboard
+            // Save specific student ID for student pages
+            localStorage.setItem("student_univ_id", data.user.student_univ_id);
+            window.location.href = "index.html"; 
           } else if (role === "teacher") {
-            window.location.href = "teacher.html";
+            window.location.href = "teacher.html"; 
           }
         } else {
-          alert("Invalid email or password. Try again!");
+          alert(data.message || "Invalid credentials");
         }
       } catch (err) {
         console.error(err);
         alert("Server error. Is Node running on Port 3000?");
       }
     });
-  </script>
+</script>
 </body>
 </html>

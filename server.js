@@ -4,7 +4,7 @@ const cors = require("cors");
 
 const app = express();
 
-// ✅ ALLOW ALL REQUESTS (Fixes Network Error)
+// ✅ ALLOW ALL REQUESTS
 app.use(cors());
 app.use(express.json());
 app.options(/.*/, cors());
@@ -14,8 +14,7 @@ const db = mysql.createPool({
   host: "mainline.proxy.rlwy.net",
   user: "root",
   password: "LSnSEoOVpvWtZjclOcNvJqlQhQuzzJbj",
-  // ⚠️ NOTE: Ensure your Railway DB is actually named "smart_campus". 
-  // If connection fails, change this back to "railway".
+  // ⚠️ Ensure this matches your actual DB name on Railway
   database: "smart_campus", 
   port: 35860,
   ssl: { rejectUnauthorized: false },
@@ -32,7 +31,9 @@ db.getConnection((err, connection) => {
   }
 });
 
-// --- AUTH ROUTES ---
+// ==========================================
+// 👤 AUTH ROUTES
+// ==========================================
 
 // Signup Route
 app.post("/signup", (req, res) => {
@@ -84,53 +85,61 @@ app.get("/students", (req, res) => {
   });
 });
 
-// ==========================================
-// 📅 ATTENDANCE ROUTES (These were missing!)
-// ==========================================
-
-// 2. Mark Attendance (Teacher clicks P/A)
-app.post("/attendance", (req, res) => {
-  const { student_univ_id, status } = req.body;
-
-  if (!student_univ_id || !status) {
-    return res.status(400).json({ success: false, message: "Missing fields" });
-  }
-
-  const subject = "Computer Networks"; // Hardcoded subject for now
-
-  // 1. Find a valid Teacher ID first to prevent crashes
-  const findTeacher = "SELECT teacher_id FROM teacher LIMIT 1";
+// 2. Fetch Courses Assigned to a Specific Teacher (NEW)
+app.get("/teacher-courses/:teacher_id", (req, res) => {
+  const { teacher_id } = req.params;
   
-  db.query(findTeacher, (err, teacherResults) => {
-    if (err) return res.status(500).json({ success: false, message: "DB Error finding teacher" });
+  const query = `
+    SELECT c.course_name, c.course_code 
+    FROM courses c
+    JOIN teacher_courses tc ON c.course_id = tc.course_id
+    WHERE tc.teacher_id = ?
+  `;
 
-    // Use found teacher or default to 1
-    const teacher_id = teacherResults.length > 0 ? teacherResults[0].teacher_id : 1;
-
-    // 2. Insert/Update Attendance
-    const query = `
-      INSERT INTO attendance (student_id, teacher_id, subject, total_classes, attended_classes)
-      SELECT s.student_id, ?, ?, 1, IF(? = 'Present', 1, 0)
-      FROM student s
-      WHERE s.student_univ_id = ?
-      ON DUPLICATE KEY UPDATE
-        total_classes = total_classes + 1,
-        attended_classes = attended_classes + IF(? = 'Present', 1, 0),
-        last_updated = CURRENT_TIMESTAMP;
-    `;
-
-    db.query(query, [teacher_id, subject, status, student_univ_id, status], (err, result) => {
-      if (err) {
-        console.error("❌ Error inserting attendance:", err);
-        return res.status(500).json({ success: false, message: err.message });
-      }
-      console.log(`✅ Marked ${status} for ${student_univ_id}`);
-      res.json({ success: true, message: "Attendance saved successfully!" });
-    });
+  db.query(query, [teacher_id], (err, results) => {
+    if (err) {
+      console.error("Error fetching courses:", err);
+      return res.status(500).json({ success: false, message: "DB Error" });
+    }
+    res.json({ success: true, data: results });
   });
 });
 
-// 3. Fetch Attendance Summary (For Student Dashboard)
+// ==========================================
+// 📅 ATTENDANCE ROUTES
+// ==========================================
+
+// 3. Mark Attendance (Updated to support Dynamic Subject & Teacher)
+app.post("/attendance", (req, res) => {
+  const { student_univ_id, status, subject, teacher_id } = req.body;
+
+  // Validate all required fields are present
+  if (!student_univ_id || !status || !subject || !teacher_id) {
+    return res.status(400).json({ success: false, message: "Missing fields (subject or teacher_id)" });
+  }
+
+  const query = `
+    INSERT INTO attendance (student_id, teacher_id, subject, total_classes, attended_classes)
+    SELECT s.student_id, ?, ?, 1, IF(? = 'Present', 1, 0)
+    FROM student s
+    WHERE s.student_univ_id = ?
+    ON DUPLICATE KEY UPDATE
+      total_classes = total_classes + 1,
+      attended_classes = attended_classes + IF(? = 'Present', 1, 0),
+      last_updated = CURRENT_TIMESTAMP;
+  `;
+
+  db.query(query, [teacher_id, subject, status, student_univ_id, status], (err, result) => {
+    if (err) {
+      console.error("❌ Error inserting attendance:", err);
+      return res.status(500).json({ success: false, message: err.message });
+    }
+    console.log(`✅ Marked ${status} for ${student_univ_id} in ${subject}`);
+    res.json({ success: true, message: "Attendance saved successfully!" });
+  });
+});
+
+// 4. Fetch Attendance Summary (For Student Dashboard)
 app.get("/attendance/:student_univ_id", (req, res) => {
   const { student_univ_id } = req.params;
   const query = `

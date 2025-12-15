@@ -72,22 +72,27 @@
 
                 <!-- Mark Attendance -->
                 <section class="panel">
-                    <h3>Mark Attendance - Computer Networks</h3>
-                    <table class="attendance-table">
-                        <thead>
-                            <tr>
-                                <th>Roll No</th>
-                                <th>Name</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="studentTableBody">
-    <tr>
-        <td colspan="3" style="text-align:center;">Loading students...</td>
-    </tr>
-</tbody>
-                    </table>
-                </section>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <h3>Mark Attendance</h3>
+        
+        <select id="courseSelect" style="padding: 8px; font-size: 16px; border-radius: 5px;">
+            <option value="" disabled selected>Select Subject...</option>
+            </select>
+    </div>
+
+    <table class="attendance-table">
+        <thead>
+            <tr>
+                <th>Roll No</th>
+                <th>Name</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody id="studentTableBody">
+            <tr><td colspan="3">Loading students...</td></tr>
+        </tbody>
+    </table>
+</section>  
 
                 <div class="panel">
                     <h3>Defaulter List</h3>
