@@ -68,90 +68,16 @@
 
                 <section class="subject-breakdown">
                     <h2>Subject-wise Breakdown</h2>
-                    <div class="SUbjects">
-                        <div class="subject-card">
-                            <div class="card-header">
-                                <h4>Data Structures (DSOOPS)</h4>
-                                <span class="subject-percentage high">100%</span>
-                            </div>
-                            <p class="subject-stats">Attended 3 of 3 classes held</p>
-                            <div class="progress-bar">
-                                <div class="progress-fill high" style="width: 100%"></div>
-                            </div>
-                        </div>
-                        <div class="subject-card">
-                            <div class="card-header">
-                                <h4>Discrete Mathematics</h4>
-                                <span class="subject-percentage high">100%</span>
-                            </div>
-                            <p class="subject-stats">Attended 2 of 2 classes held</p>
-                            <div class="progress-bar">
-                                <div class="progress-fill high" style="width: 100%"></div>
-                            </div>
-                        </div>
-                        <div class="subject-card">
-                            <div class="card-header">
-                                <h4>Elec. Engineering (FEE II)</h4>
-                                <span class="subject-percentage high">100%</span>
-                            </div>
-                            <p class="subject-stats">Attended 2 of 2 classes held</p>
-                            <div class="progress-bar">
-                                <div class="progress-fill high" style="width: 100%"></div>
-                            </div>
-                        </div>
-                        <div class="subject-card">
-                            <div class="card-header">
-                                <h4>Software Engineering (OOSE)</h4>
-                                <span class="subject-percentage high">100%</span>
-                            </div>
-                            <p class="subject-stats">Attended 2 of 2 classes held</p>
-                            <div class="progress-bar">
-                                <div class="progress-fill high" style="width: 100%"></div>
-                            </div>
-                        </div>
-                        <div class="subject-card">
-                            <div class="card-header">
-                                <h4>Database Management (DBMS)</h4>
-                                <span class="subject-percentage high">100%</span>
-                            </div>
-                            <p class="subject-stats">Attended 0 of 0 classes held</p>
-                            <div class="progress-bar">
-                                <div class="progress-fill high" style="width: 100%"></div>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="SUbjects" id="subjectsContainer">
+    <p style="padding:20px; color:#666;">Loading attendance data...</p>
+</div>
                 </section>
 
                 <!-- Attendance -->
                 <section class="panel">
                     <h2>Attendance Comparison</h2>
-                    <div class="bar-chart">
-                        <div class="bar">
-                            <span class="label">DSOOPS</span>
-                            <div class="bar-fill" style="width: 95%"></div>
-                            <span class="value">95%</span>
-                        </div>
-                        <div class="bar">
-                            <span class="label">Discrete</span>
-                            <div class="bar-fill" style="width: 88%"></div>
-                            <span class="value">88%</span>
-                        </div>
-                        <div class="bar">
-                            <span class="label">FEE II</span>
-                            <div class="bar-fill" style="width: 76%"></div>
-                            <span class="value">76%</span>
-                        </div>
-                        <div class="bar">
-                            <span class="label">OOSE</span>
-                            <div class="bar-fill" style="width: 92%"></div>
-                            <span class="value">92%</span>
-                        </div>
-                        <div class="bar">
-                            <span class="label">DBMS</span>
-                            <div class="bar-fill" style="width: 100%"></div>
-                            <span class="value">100%</span>
-                        </div>
-                    </div>
+                    <div class="bar-chart" id="chartContainer">
+    </div>
                 </section>
             </div>
         </main>

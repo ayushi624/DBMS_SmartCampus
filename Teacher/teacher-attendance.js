@@ -1,120 +1,166 @@
-// ===== 1. SEARCH FILTER =====
-const searchInput = document.getElementById("search");
-const tableRows = document.querySelectorAll(".attendance-table tbody tr");
+// ✅ Configuration
+const API_BASE_URL = "http://127.0.0.1:3000"; // Ensure this matches your Server Port
 
-searchInput?.addEventListener("input", () => {
-  const query = searchInput.value.toLowerCase();
-  tableRows.forEach(row => {
-    const roll = row.children[0].textContent.toLowerCase();
-    const name = row.children[1].textContent.toLowerCase();
-    row.style.display = roll.includes(query) || name.includes(query) ? "" : "none";
-  });
+document.addEventListener("DOMContentLoaded", () => {
+    loadStudents();
+    setupSearch();
+    setupModal();
 });
 
-// ===== 2. MARK ATTENDANCE =====
-document.querySelectorAll(".attendance-actions").forEach(actions => {
-  const row = actions.closest("tr");
-  const rollNo = row.children[0].textContent;
+// ==================================================
+// 1. FETCH & DISPLAY STUDENTS
+// ==================================================
+async function loadStudents() {
+    const tableBody = document.getElementById("studentTableBody");
 
-  actions.addEventListener("click", (e) => {
-    if (e.target.classList.contains("btn-present")) {
-      setAttendance(rollNo, "Present", row);
-    } else if (e.target.classList.contains("btn-absent")) {
-      setAttendance(rollNo, "Absent", row);
+    try {
+        const response = await fetch(`${API_BASE_URL}/students`);
+        const students = await response.json();
+
+        // Clear "Loading..." text
+        tableBody.innerHTML = "";
+
+        if (students.length === 0) {
+            tableBody.innerHTML = "<tr><td colspan='3'>No students found in database.</td></tr>";
+            return;
+        }
+
+        // Generate HTML for each student
+        students.forEach(student => {
+            const row = document.createElement("tr");
+            
+            // Check local storage to see if we already marked them today (optional UI persistence)
+            const savedStatus = localStorage.getItem(`attendance_${student.student_univ_id}`);
+            const rowClass = savedStatus ? savedStatus.toLowerCase() : "";
+
+            row.innerHTML = `
+                <td>${student.student_univ_id}</td>
+                <td>${student.full_name}</td>
+                <td class="attendance-actions">
+                    <button class="btn-present" onclick="markAttendance('${student.student_univ_id}', 'Present', this)">P</button>
+                    <button class="btn-absent" onclick="markAttendance('${student.student_univ_id}', 'Absent', this)">A</button>
+                </td>
+            `;
+
+            // Apply styling if previously marked
+            if (savedStatus) {
+                row.classList.add(rowClass);
+                // Disable the clicked button visually
+                const pBtn = row.querySelector(".btn-present");
+                const aBtn = row.querySelector(".btn-absent");
+                if (savedStatus === "Present") pBtn.style.opacity = "1";
+                if (savedStatus === "Absent") aBtn.style.opacity = "1";
+            }
+
+            tableBody.appendChild(row);
+        });
+
+    } catch (error) {
+        console.error("Error loading students:", error);
+        tableBody.innerHTML = "<tr><td colspan='3' style='color:red;'>Error connecting to server. Is Node running?</td></tr>";
     }
-  });
-
-  // Restore previous state (if exists)
-  const saved = localStorage.getItem(`attendance_${rollNo}`);
-  if (saved) {
-    applyAttendance(row, saved);
-  }
-});
-
-function setAttendance(rollNo, status, row) {
-  localStorage.setItem(`attendance_${rollNo}`, status);
-  applyAttendance(row, status);
-  showToast(`Marked ${status} for ${row.children[1].textContent}`);
 }
 
-function applyAttendance(row, status) {
-  row.classList.remove("present", "absent");
-  row.classList.add(status.toLowerCase());
-  row.querySelector(".btn-present").disabled = status === "Present";
-  row.querySelector(".btn-absent").disabled = status === "Absent";
+// ==================================================
+// 2. MARK ATTENDANCE (SEND TO DB)
+// ==================================================
+async function markAttendance(studentUnivId, status, btnElement) {
+    const row = btnElement.closest("tr");
+    
+    // UI Feedback immediately (Optimistic UI)
+    row.classList.remove("present", "absent");
+    row.classList.add(status.toLowerCase());
+    
+    // Save to LocalStorage (so it persists if page reloads)
+    localStorage.setItem(`attendance_${studentUnivId}`, status);
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/attendance`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                student_univ_id: studentUnivId,
+                status: status,
+                date: new Date().toISOString().split("T")[0] // YYYY-MM-DD
+            }),
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            showToast(`✅ Marked ${status} for ID: ${studentUnivId}`);
+        } else {
+            showToast(`❌ Error: ${result.message}`);
+        }
+
+    } catch (error) {
+        console.error("Network Error:", error);
+        showToast("⚠️ Server error. Attendance not saved.");
+    }
 }
 
-// ===== 3. RESET (Optional - for testing) =====
-// Uncomment this line to clear attendance every reload
-// localStorage.clear();
-
-// ===== 4. MODAL TOGGLE =====
-const modal = document.getElementById("defaulterModal");
-const closeBtn = modal?.querySelector(".close-btn");
-
-if (modal && closeBtn) {
-  closeBtn.addEventListener("click", (e) => {
-    e.preventDefault();
-    modal.style.display = "none";
-  });
-
-  document.querySelector(".btn-defaulters")?.addEventListener("click", (e) => {
-    e.preventDefault();
-    modal.style.display = "flex";
-  });
+// ==================================================
+// 3. SEARCH FUNCTIONALITY
+// ==================================================
+function setupSearch() {
+    const searchInput = document.getElementById("search");
+    
+    searchInput?.addEventListener("input", () => {
+        const query = searchInput.value.toLowerCase();
+        const rows = document.querySelectorAll("#studentTableBody tr");
+        
+        rows.forEach(row => {
+            const roll = row.children[0].textContent.toLowerCase();
+            const name = row.children[1].textContent.toLowerCase();
+            // Show if matches, hide if not
+            row.style.display = (roll.includes(query) || name.includes(query)) ? "" : "none";
+        });
+    });
 }
 
-// ===== 5. TOAST MESSAGE =====
+// ==================================================
+// 4. TOAST NOTIFICATIONS
+// ==================================================
 function showToast(message) {
-  const toast = document.createElement("div");
-  toast.textContent = message;
-  toast.style.position = "fixed";
-  toast.style.bottom = "20px";
-  toast.style.right = "20px";
-  toast.style.background = "#333";
-  toast.style.color = "#fff";
-  toast.style.padding = "10px 16px";
-  toast.style.borderRadius = "8px";
-  toast.style.fontSize = "14px";
-  toast.style.opacity = "0";
-  toast.style.transition = "opacity 0.4s ease";
-  document.body.appendChild(toast);
-  setTimeout(() => (toast.style.opacity = "1"), 50);
-  setTimeout(() => {
-    toast.style.opacity = "0";
-    setTimeout(() => toast.remove(), 400);
-  }, 2000);
-}
-
-
-
-// ===== 6. SAVE ATTENDANCE TO BACKEND =====
-async function saveAttendance(rollNo, status) {
-  try {
-    const res = await fetch("http://localhost:5000/attendance", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        student_univ_id: rollNo,
-        status: status,
-        date: new Date().toISOString().split("T")[0], // today’s date
-      }),
+    const toast = document.createElement("div");
+    toast.textContent = message;
+    Object.assign(toast.style, {
+        position: "fixed", bottom: "20px", right: "20px",
+        background: "#333", color: "#fff", padding: "12px 20px",
+        borderRadius: "8px", fontSize: "14px", zIndex: "1000",
+        boxShadow: "0 4px 6px rgba(0,0,0,0.1)", opacity: "0",
+        transition: "opacity 0.3s ease"
     });
 
-    const data = await res.json();
-    if (data.success) {
-      console.log(`✅ Attendance saved for ${rollNo}`);
-    } else {
-      console.error("❌ Failed to save attendance:", data.message);
-    }
-  } catch (err) {
-    console.error("⚠️ Error saving attendance:", err);
-  }
+    document.body.appendChild(toast);
+    
+    // Fade in
+    requestAnimationFrame(() => toast.style.opacity = "1");
+
+    // Fade out and remove
+    setTimeout(() => {
+        toast.style.opacity = "0";
+        setTimeout(() => toast.remove(), 300);
+    }, 2000);
 }
 
-// hook it into your existing setAttendance()
-const oldSetAttendance = setAttendance;
-setAttendance = (rollNo, status, row) => {
-  oldSetAttendance(rollNo, status, row); // keep the old behavior
-  saveAttendance(rollNo, status); // also sync to backend
-};
+// ==================================================
+// 5. MODAL (Optional Defaulter List)
+// ==================================================
+function setupModal() {
+    const modal = document.getElementById("defaulterModal");
+    const closeBtn = modal?.querySelector(".close-btn");
+    const openBtn = document.querySelector(".btn-defaulters");
+
+    if (modal && closeBtn && openBtn) {
+        closeBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            modal.style.display = "none";
+        });
+
+        openBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            modal.style.display = "flex";
+        });
+    }
+}
