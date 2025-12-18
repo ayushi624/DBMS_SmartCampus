@@ -61,32 +61,30 @@ app.post("/signup", (req, res) => {
 });
 
 // Login Route
-app.post("/login", (req, res) => {
-  const { email, password, role } = req.body;
+app.post('/login', (req, res) => {
+  const { email, password } = req.body;
 
-  if (!email || !password || !role) {
-    return res.status(400).json({ success: false, message: "Missing fields" });
-  }
+  const sql = `
+    SELECT *
+    FROM student
+    WHERE email = ?
+    AND password = SHA2(?, 256)
+  `;
 
-  const table = role === "student" ? "student" : "teacher";
-  
-  // Note: It's better to verify password hashes in production, 
-  // but for now strict comparison is fine if stored as plain text.
-  const query = `SELECT * FROM ${table} WHERE email = ? AND password = ?`;
-
-  db.query(query, [email, password], (err, results) => {
+  db.query(sql, [email, password], (err, result) => {
     if (err) {
       console.error(err);
-      return res.status(500).json({ success: false, message: "Server error" });
+      return res.status(500).send("Server error");
     }
 
-    if (results.length > 0) {
-      res.json({ success: true, message: "Login successful", user: results[0] });
+    if (result.length > 0) {
+      res.send("Login successful");
     } else {
-      res.json({ success: false, message: "Invalid credentials" });
+      res.status(401).send("Invalid email or password");
     }
   });
 });
+
 /* =====================================================
    COMPLAINT MANAGEMENT ROUTES
 ===================================================== */
