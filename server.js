@@ -87,6 +87,138 @@ app.post("/login", (req, res) => {
     }
   });
 });
+/* =====================================================
+   COMPLAINT MANAGEMENT ROUTES
+===================================================== */
+
+/* STUDENT → SUBMIT COMPLAINT */
+app.post("/complaints", (req, res) => {
+  const { student_univ_id, title, description } = req.body;
+
+  if (!student_univ_id || !title || !description) {
+    return res.status(400).json({
+      success: false,
+      message: "Missing required fields",
+    });
+  }
+
+  const findStudentQuery = `
+    SELECT student_id FROM student
+    WHERE student_univ_id = ?
+  `;
+
+  db.query(findStudentQuery, [student_univ_id], (err, result) => {
+    if (err || result.length === 0) {
+      console.error(err);
+      return res.status(400).json({
+        success: false,
+        message: "Invalid student university ID",
+      });
+    }
+
+    const student_id = result[0].student_id;
+
+    const insertComplaintQuery = `
+      INSERT INTO complaints (student_id, title, description)
+      VALUES (?, ?, ?)
+    `;
+
+    db.query(
+      insertComplaintQuery,
+      [student_id, title, description],
+      (err) => {
+        if (err) {
+          console.error(err);
+          return res.status(500).json({
+            success: false,
+            message: "Failed to submit complaint",
+          });
+        }
+
+        res.json({
+          success: true,
+          message: "Complaint submitted successfully",
+        });
+      }
+    );
+  });
+});
+
+/* STUDENT → FETCH OWN COMPLAINTS */
+app.get("/complaints/:student_univ_id", (req, res) => {
+  const { student_univ_id } = req.params;
+
+  const query = `
+    SELECT c.*
+    FROM complaints c
+    JOIN student s ON c.student_id = s.student_id
+    WHERE s.student_univ_id = ?
+    ORDER BY c.created_at DESC
+  `;
+
+  db.query(query, [student_univ_id], (err, result) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ success: false });
+    }
+
+    res.json({
+      success: true,
+      data: result,
+    });
+  });
+});
+
+/* TEACHER → FETCH ALL COMPLAINTS (USING VIEW) */
+app.get("/complaints", (req, res) => {
+  const query = `SELECT * FROM teacher_complaints_view`;
+
+  db.query(query, (err, result) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ success: false });
+    }
+
+    res.json({
+      success: true,
+      data: result,
+    });
+  });
+});
+
+/* TEACHER → UPDATE COMPLAINT STATUS */
+app.put("/complaints/:id", (req, res) => {
+  const { status } = req.body;
+  const complaint_id = req.params.id;
+
+  if (!status) {
+    return res.status(400).json({
+      success: false,
+      message: "Status is required",
+    });
+  }
+
+  const updateQuery = `
+    UPDATE complaints
+    SET status = ?
+    WHERE complaint_id = ?
+  `;
+
+  db.query(updateQuery, [status, complaint_id], (err) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to update status",
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "Complaint status updated successfully",
+    });
+  });
+});
 
 
 // ✅ Add a simple "Hello" route to test the server in the browser

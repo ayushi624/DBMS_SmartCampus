@@ -87,7 +87,7 @@ document.getElementById("reportForm").addEventListener("submit", async (e) => {
   if (!title || !description) return alert("Please fill all fields!");
 
   try {
-    const res = await fetch("http://localhost:5000/complaints", {
+    const res = await fetch("http://localhost:3000/complaints", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ student_univ_id: studentUnivId, title, description }),
@@ -108,7 +108,7 @@ document.getElementById("reportForm").addEventListener("submit", async (e) => {
 // Fetch and display student's complaints
 async function fetchComplaints() {
   try {
-    const res = await fetch(`http://localhost:5000/complaints/${studentUnivId}`);
+    const res = await fetch(`http://localhost:3000/complaints/${studentUnivId}`);
     const data = await res.json();
     const tbody = document.querySelector("#reportsTable tbody");
     tbody.innerHTML = "";

@@ -91,7 +91,7 @@
 
 <script>
 async function fetchComplaints() {
-  const res = await fetch("http://localhost:5000/complaints");
+  const res = await fetch("http://localhost:3000/complaints");
   const data = await res.json();
 
   const tbody = document.querySelector(".reports-table tbody");
@@ -119,7 +119,7 @@ async function fetchComplaints() {
     select.addEventListener("change", async (e) => {
       const id = e.target.getAttribute("data-id");
       const status = e.target.value;
-      await fetch(`http://localhost:5000/complaints/${id}`, {
+      await fetch(`http://localhost:3000/complaints/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status })
